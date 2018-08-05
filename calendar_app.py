@@ -229,26 +229,6 @@ class Calendar:
     def start_calendar(self):
         self.main_window.mainloop()
 
-    def refresh_plate(self):
-        counter = 0
-        for day_button in self.button_list:
-            print(counter)
-            # print(counter % 7)
-            # if int(day_button["text"]) % 7 in [0, 6]:
-            if counter % 7 in [5, 6]:
-                bg = "#FFFFFF"
-                fg = "#404040"
-                bold = "arial 10 bold"
-            else:
-                bg = "#C0C0C0"
-                fg = "#404040"
-                bold = "arial 10"
-            counter += 1
-            day_button.configure(bg=bg,
-                                 fg=fg,
-                                 font=bold,
-                                 state="active")
-
 
 if __name__ == "__main__":
     calendar_runner = Calendar()
