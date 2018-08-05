@@ -81,7 +81,7 @@ class Calendar:
         display_date.grid(row=0, column=0, rowspan=2, sticky='news')
 
         self.display_description_variable = tkinter.StringVar(self.display_frame)
-        self.display_description_variable.set("Current day")
+        self.display_description_variable.set("   Current day")
         display_description = tkinter.Label(self.display_frame, textvariable=self.display_description_variable,
                                             height=3, anchor="w")
         display_description.grid(row=2, column=0, rowspan=2, sticky='news')
