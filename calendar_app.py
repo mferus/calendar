@@ -37,17 +37,13 @@ class Calendar:
             day_name.grid(row=3, column=i, sticky="news")
 
     def default_start(self):
-        date = datetime.date.today()
-        self.month_text.set(self._get_month_name(date))
-        self.year_text.set(date.year)
-        self._set_date_related_elements(date)
-        self._create_calendar(date)
+        self.month_text.set(self.months[self.current_date.month - 1])
+        self.year_text.set(self.current_date.year)
+        self._set_date_related_elements()
+        self._create_calendar(self.current_date.year, self.current_date.month)
         self._start_calendar()
 
-    def _get_month_name(self, date_in_time):
-        return self.months[date_in_time.month - 1]
-
-    def _set_date_related_elements(self, date):
+    def _set_date_related_elements(self):
         self.description_frame.grid(row=10, column=0, columnspan=7, rowspan=4, sticky="we")
         self.description_date = tkinter.StringVar(self.description_frame)
         date_label = tkinter.Label(
@@ -56,7 +52,7 @@ class Calendar:
             font="arial 13 italic",
             anchor="w")
         date_label.grid(row=0, column=0, rowspan=2, sticky='news')
-        self.description_date.set(self.get_date_string(date))
+        self.description_date.set(self.get_date_string(self.current_date))
         self.description_text = tkinter.StringVar(self.description_frame)
         description_label = tkinter.Label(
             self.description_frame,
@@ -162,7 +158,7 @@ class Calendar:
             self.month_text.set(self.months[self.months.index(self.month_text.get()) - 1])
             month = self.months.index(self.month_text.get()) + 1
             year = self.year_text.get()
-        self._create_calendar(datetime.date(year, month, 1))
+        self._create_calendar(year, month)
 
     def get_next_month(self):
         if self.months.index(self.month_text.get()) + 1 == 12:
@@ -174,16 +170,14 @@ class Calendar:
             self.month_text.set(self.months[self.months.index(self.month_text.get()) + 1])
             month = self.months.index(self.month_text.get()) + 1
             year = self.year_text.get()
-        self._create_calendar(datetime.date(year, month, 1))
+        self._create_calendar(year, month)
 
     def get_last_year(self):
-        self._create_calendar(datetime.date((self.year_text.get() - 1),
-                                            (self.months.index(self.month_text.get()) + 1), 1))
+        self._create_calendar(self.year_text.get() - 1, self.months.index(self.month_text.get()) + 1)
         self.year_text.set(self.year_text.get() - 1)
 
     def get_next_year(self):
-        self._create_calendar(datetime.date((self.year_text.get() + 1),
-                                            (self.months.index(self.month_text.get()) + 1), 1))
+        self._create_calendar(self.year_text.get() + 1, self.months.index(self.month_text.get()) + 1)
         self.year_text.set(self.year_text.get() + 1)
 
     def get_day_description(self, day_button):
@@ -199,7 +193,8 @@ class Calendar:
         description = HOLIDAYS.get(day_key, "(...)")
         self.description_text.set('   ' + description)
 
-    def _create_calendar(self, date):
+    def _create_calendar(self, year, month):
+        date = datetime.date(year, month, 1)
         [instance.destroy() for instance in self.buttons]
         current_month_day = 1
         next_month_day = 1
