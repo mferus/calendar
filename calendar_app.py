@@ -88,7 +88,7 @@ class Calendar:
             return 'arial 10'
 
     @staticmethod
-    def get_first_day_of_month_number(date_in_time):
+    def get_first_day_of_month_as_day_of_week(date_in_time):
         return datetime.date(date_in_time.year, date_in_time.month, 1).isoweekday()
 
     @staticmethod
@@ -194,13 +194,12 @@ class Calendar:
         description = HOLIDAYS.get(day_key, "(...)")
         self.description_text.set('   ' + description)
 
-    def _create_calendar(self, given_year, given_month):
+    def _get_month_holders(self, given_year, given_month):
         date = datetime.date(given_year, given_month, 1)
-        buttons = self._get_buttons()
         last_month_days = self.get_days_of_last_month(date)
         last_month_number = (date - datetime.timedelta(days=5)).month
         next_month_number = (date + datetime.timedelta(days=35)).month
-        previous_month_day_in_view = last_month_days - (self.get_first_day_of_month_number(date) - 2)
+        previous_month_day_in_view = last_month_days - (self.get_first_day_of_month_as_day_of_week(date) - 2)
         current_month_day_in_view = 1
         next_month_day_in_view = 1
 
@@ -210,6 +209,11 @@ class Calendar:
         last_month_holder = MonthHolder(previous_month_day_in_view, last_month_days, last_month_number)
         current_month_holder = MonthHolder(current_month_day_in_view, self.get_days_in_month(date), date.month)
         next_month_holder = MonthHolder(next_month_day_in_view, float('inf'), next_month_number)
+        return last_month_holder, current_month_holder, next_month_holder
+
+    def _create_calendar(self, given_year, given_month):
+        last_month_holder, current_month_holder, next_month_holder = self._get_month_holders(given_year, given_month)
+        buttons = self._get_buttons()
 
         for row in range(6):
             for column in range(7):
