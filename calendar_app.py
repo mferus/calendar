@@ -231,12 +231,7 @@ class Calendar:
                 day_key = self._format_holidays_key(day=holder.counter, month=holder.month, year=given_year)
                 calendar_button.set_if_holiday(day_key)
                 day_button = buttons.__next__()
-                day_button.configure(
-                    bg=calendar_button.bg,
-                    fg=calendar_button.fg,
-                    font=calendar_button.font,
-                    state=calendar_button.state,
-                    text=holder.counter)
+                day_button.configure(text=holder.counter, **calendar_button.get_parameters())
                 day_button.configure(command=lambda button=day_button: self.get_day_description(button))
                 day_button.grid(row=row+4, column=column, sticky="news")
                 holder.update_counter()
@@ -272,6 +267,14 @@ class CalendarButton:
         self.font = "arial 10 bold" if self.is_weekend else "arial 10"
         self.bg = None
         self.fg = None
+
+    def get_parameters(self):
+        return {
+            "bg": self.bg,
+            "fg": self.fg,
+            "font": self.font,
+            "state": self.state,
+        }
 
     def set_if_holiday(self, day_key):
         if day_key in HOLIDAYS:
