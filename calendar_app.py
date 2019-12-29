@@ -21,7 +21,7 @@ class Calendar:
         self.description_date = None
         self.description_text = None
         self.current_date = datetime.date.today()
-        self.buttons = []
+        self.buttons = [tkinter.Button(self.main_window) for _ in range(42)]
 
     def setup_window(self):
         self._general_setup()
@@ -195,10 +195,9 @@ class Calendar:
 
     def _create_calendar(self, year, month):
         date = datetime.date(year, month, 1)
-        [instance.destroy() for instance in self.buttons]
         current_month_day = 1
         next_month_day = 1
-
+        buttons = self._get_buttons()
         days_of_last_month = self.get_days_of_last_month(
             datetime.date((self.year_text.get()), date.month, 1))
         last_month_number = (date - datetime.timedelta(days=5)).month
@@ -225,8 +224,8 @@ class Calendar:
 
                 day_key = self._format_holidays_key(day=button_number, month=month, year=date.year)
                 calendar_button.set_if_holiday(day_key)
-                day_button = tkinter.Button(
-                    self.main_window,
+                day_button = buttons.__next__()
+                day_button.configure(
                     bg=calendar_button.bg,
                     fg=calendar_button.fg,
                     font=calendar_button.font,
@@ -234,7 +233,10 @@ class Calendar:
                     text=button_number)
                 day_button.configure(command=lambda button=day_button: self.get_day_description(button))
                 day_button.grid(row=row, column=column, sticky="news")
-                self.buttons.append(day_button)
+
+    def _get_buttons(self):
+        for button in self.buttons:
+            yield button
 
 
 HOLIDAYS = {}
@@ -257,7 +259,11 @@ class CalendarButton:
             self.fg = "#404040" if self.is_weekend else "black"
 
 
-if __name__ == "__main__":
+def main():
     calendar_runner = Calendar()
     calendar_runner.setup_window()
     calendar_runner.default_start()
+
+
+if __name__ == "__main__":
+    main()
