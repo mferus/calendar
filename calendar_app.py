@@ -229,7 +229,7 @@ class Calendar:
                     holder = next_month_holder
 
                 day_key = self._format_holidays_key(day=holder.counter, month=holder.month, year=given_year)
-                calendar_button.set_if_holiday(day_key)
+                calendar_button.set_parameters_depending_on_holiday(day_key)
                 day_button = buttons.__next__()
                 day_button.configure(command=lambda button=day_button: self.get_day_description(button),
                                      text=holder.counter, **calendar_button.get_parameters())
@@ -276,7 +276,7 @@ class CalendarButton:
             "state": self.state,
         }
 
-    def set_if_holiday(self, day_key):
+    def set_parameters_depending_on_holiday(self, day_key):
         if day_key in HOLIDAYS:
             self.bg = "#A0A0A0" if HOLIDAYS[day_key] == "Current day" else "#C0C0C0"
             self.fg = "#FFFFFF"
