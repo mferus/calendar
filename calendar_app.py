@@ -196,32 +196,33 @@ class Calendar:
 
     def _create_calendar(self, year, month):
         date = datetime.date(year, month, 1)
-        current_month_day = 1
-        next_month_day = 1
         buttons = self._get_buttons()
-        days_of_last_month = self.get_days_of_last_month(
-            datetime.date((self.year_text.get()), date.month, 1))
+        last_month_days = self.get_days_of_last_month(date)
         last_month_number = (date - datetime.timedelta(days=5)).month
         next_month_number = (date + datetime.timedelta(days=35)).month
-        remaining_last_month_day = days_of_last_month - (self.get_first_day_of_month_number(date) - 2)
+        previous_month_day_in_view = last_month_days - (self.get_first_day_of_month_number(date) - 2)
+        current_month_day_in_view = 1
+        next_month_day_in_view = 1
+        if previous_month_day_in_view > last_month_days:
+            previous_month_day_in_view -= 7
         for row in range(4, 10):
             for column in range(7):
                 calendar_button = CalendarButton(column)
-                if remaining_last_month_day <= days_of_last_month:
-                    button_number = remaining_last_month_day
+                if previous_month_day_in_view <= last_month_days:
+                    button_number = previous_month_day_in_view
                     calendar_button.fg = "grey"
                     month = last_month_number
-                    remaining_last_month_day += 1
-                elif not current_month_day > self.get_days_in_month(date):
-                    button_number = current_month_day
+                    previous_month_day_in_view += 1
+                elif not current_month_day_in_view > self.get_days_in_month(date):
+                    button_number = current_month_day_in_view
                     calendar_button.state = "normal"
                     month = date.month
-                    current_month_day += 1
+                    current_month_day_in_view += 1
                 else:
-                    button_number = next_month_day
+                    button_number = next_month_day_in_view
                     calendar_button.fg = "grey"
                     month = next_month_number
-                    next_month_day += 1
+                    next_month_day_in_view += 1
 
                 day_key = self._format_holidays_key(day=button_number, month=month, year=date.year)
                 calendar_button.set_if_holiday(day_key)
