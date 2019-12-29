@@ -117,11 +117,11 @@ class Calendar:
         self.main_window.maxsize(301, 391)
 
     @staticmethod
-    def _format_holidays_key(day, month, year):
+    def _get_holidays_key_format(day, month, year):
         return f'{day}/{month}/{year}'
 
     def _declare_range_for_holidays(self):
-        current_day = self._format_holidays_key(
+        current_day = self._get_holidays_key_format(
             day=self.current_date.day,
             month=self.current_date.month,
             year=self.current_date.year)
@@ -129,7 +129,7 @@ class Calendar:
         for x in range(self.current_date.year - 20, self.current_date.year + 20):
             holidays = Poland().holidays(x)
             for holiday in holidays:
-                dictionary_key = self._format_holidays_key(
+                dictionary_key = self._get_holidays_key_format(
                     day=holiday[0].day,
                     month=holiday[0].month,
                     year=holiday[0].year)
@@ -187,7 +187,7 @@ class Calendar:
                                                          (self.months.index(self.month_text.get()) + 1),
                                                          day_of_month))
         self.description_date.set(date_string)
-        day_key = self._format_holidays_key(
+        day_key = self._get_holidays_key_format(
             day=day_of_month,
             month=self.months.index(self.month_text.get())+1,
             year=self.year_text.get())
@@ -228,7 +228,7 @@ class Calendar:
                     calendar_button.fg = "grey"
                     holder = next_month_holder
 
-                day_key = self._format_holidays_key(day=holder.counter, month=holder.month, year=given_year)
+                day_key = self._get_holidays_key_format(day=holder.counter, month=holder.month, year=given_year)
                 calendar_button.set_parameters_depending_on_holiday(day_key)
                 day_button = buttons.__next__()
                 day_button.configure(command=lambda button=day_button: self.get_day_description(button),
