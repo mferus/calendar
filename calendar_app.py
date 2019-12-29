@@ -231,8 +231,8 @@ class Calendar:
                 day_key = self._format_holidays_key(day=holder.counter, month=holder.month, year=given_year)
                 calendar_button.set_if_holiday(day_key)
                 day_button = buttons.__next__()
-                day_button.configure(text=holder.counter, **calendar_button.get_parameters())
-                day_button.configure(command=lambda button=day_button: self.get_day_description(button))
+                day_button.configure(command=lambda button=day_button: self.get_day_description(button),
+                                     text=holder.counter, **calendar_button.get_parameters())
                 day_button.grid(row=row+4, column=column, sticky="news")
                 holder.update_counter()
 
