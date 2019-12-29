@@ -154,6 +154,7 @@ class Calendar:
             self.month_text.set(self.months[11])
             month = 12
             year = self.year_text.get() - 1
+            self.year_text.set(year)
         else:
             self.month_text.set(self.months[self.months.index(self.month_text.get()) - 1])
             month = self.months.index(self.month_text.get()) + 1
@@ -165,7 +166,7 @@ class Calendar:
             self.month_text.set(self.months[0])
             month = 1
             year = self.year_text.get() + 1
-            self.year_text.set(self.year_text.get() + 1)
+            self.year_text.set(year)
         else:
             self.month_text.set(self.months[self.months.index(self.month_text.get()) + 1])
             month = self.months.index(self.month_text.get()) + 1
