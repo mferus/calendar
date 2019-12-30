@@ -161,7 +161,7 @@ class Calendar:
         for row in range(6):
             for column in range(7):
                 calendar_button = CalendarButton(column)
-                holder = holder_builder.decide_which_holder_use(calendar_button)
+                holder = holder_builder.get_holder(calendar_button)
 
                 calendar_button.set_parameters_depending_on_holiday(holder.__repr__())
                 day_button = buttons.__next__()
@@ -176,10 +176,10 @@ class Calendar:
 
 class MonthHolderBuilder:
     def __init__(self, given_year, given_month):
-        self.last_month_holder, self.current_month_holder, self.next_month_holder = MonthHolderBuilder.get_holders(
+        self.last_month_holder, self.current_month_holder, self.next_month_holder = MonthHolderBuilder._get_holders(
             given_year, given_month)
 
-    def decide_which_holder_use(self, calendar_button):
+    def get_holder(self, calendar_button):
         if not self.last_month_holder.is_exhausted():
             calendar_button.fg = "grey"
             holder = self.last_month_holder
@@ -192,7 +192,7 @@ class MonthHolderBuilder:
         return holder
 
     @classmethod
-    def get_holders(cls, given_year, given_month):
+    def _get_holders(cls, given_year, given_month):
         date = datetime.date(given_year, given_month, 1)
         last_month_holder = cls._get_last_month_holder(date)
         current_month_holder = cls._get_current_month_holder(date)
