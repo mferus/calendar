@@ -66,28 +66,6 @@ class Calendar:
         self.main_window.mainloop()
 
     @staticmethod
-    def get_day_background(column):
-        if column / 5 == 1 or column / 6 == 1:
-            return "#FFFFFF"
-        else:
-            return "#d9d9d9"
-
-    @staticmethod
-    def get_day_foreground(column):
-        if column / 5 == 1 or column / 6 == 1:
-            return "#404040"
-        else:
-            return "black"
-
-    @staticmethod
-    def get_day_font(column):
-        weekend_condition = (column / 5 == 1 or column / 6 == 1)
-        if weekend_condition:
-            return 'arial 10 bold'
-        else:
-            return 'arial 10'
-
-    @staticmethod
     def get_first_day_of_month_as_day_of_week(date_in_time):
         return datetime.date(date_in_time.year, date_in_time.month, 1).isoweekday()
 
