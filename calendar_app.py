@@ -175,8 +175,10 @@ class Calendar:
     def _get_month_holders(self, given_year, given_month):
         date = datetime.date(given_year, given_month, 1)
         last_month_days = self.get_days_of_last_month(date)
-        last_month_number = (date - datetime.timedelta(days=5)).month
-        next_month_number = (date + datetime.timedelta(days=35)).month
+        last_month_date = date - datetime.timedelta(days=5)
+        last_month_number, last_month_year = last_month_date.month, last_month_date.year
+        next_month_date = date + datetime.timedelta(days=35)
+        next_month_number, next_month_year = next_month_date.month, next_month_date.year
         previous_month_day_in_view = last_month_days - (self.get_first_day_of_month_as_day_of_week(date) - 2)
         current_month_day_in_view = 1
         next_month_day_in_view = 1
@@ -184,9 +186,12 @@ class Calendar:
         if previous_month_day_in_view > last_month_days:
             previous_month_day_in_view -= 7
 
-        last_month_holder = MonthHolder(previous_month_day_in_view, last_month_days, last_month_number)
-        current_month_holder = MonthHolder(current_month_day_in_view, self.get_days_in_month(date), date.month)
-        next_month_holder = MonthHolder(next_month_day_in_view, float('inf'), next_month_number)
+        last_month_holder = MonthHolder(
+            previous_month_day_in_view, last_month_days, last_month_number, last_month_year)
+        current_month_holder = MonthHolder(
+            current_month_day_in_view, self.get_days_in_month(date), date.month, given_year)
+        next_month_holder = MonthHolder(
+            next_month_day_in_view, float('inf'), next_month_number, next_month_year)
         return last_month_holder, current_month_holder, next_month_holder
 
     def _create_calendar(self, given_year, given_month):
@@ -206,7 +211,7 @@ class Calendar:
                     calendar_button.fg = "grey"
                     holder = next_month_holder
 
-                day_key = self._get_holidays_key_format(day=holder.counter, month=holder.month, year=given_year)
+                day_key = self._get_holidays_key_format(day=holder.counter, month=holder.month, year=holder.year)
                 calendar_button.set_parameters_depending_on_holiday(day_key)
                 day_button = buttons.__next__()
                 day_button.configure(command=lambda button=day_button: self.get_day_description(button),
@@ -220,10 +225,11 @@ class Calendar:
 
 
 class MonthHolder:
-    def __init__(self, starting_point, ending_point, month):
+    def __init__(self, starting_point, ending_point, month, year):
         self.counter = starting_point
         self.maximum = ending_point
         self.month = month
+        self.year = year
 
     def is_exhausted(self):
         if self.counter > self.maximum:
@@ -256,7 +262,7 @@ class CalendarButton:
 
     def set_parameters_depending_on_holiday(self, day_key):
         if day_key in HOLIDAYS:
-            self.bg = "#A0A0A0" if HOLIDAYS[day_key] == "Current day" else "#C0C0C0"
+            self.bg = "#B2B2B2" if HOLIDAYS[day_key] == "Current day" else "#C0C0C0"
             self.fg = "#FFFFFF"
         else:
             self.bg = "#FFFFFF" if self.is_weekend else "#d9d9d9"
