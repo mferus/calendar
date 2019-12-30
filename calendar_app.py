@@ -167,7 +167,7 @@ class Holidays:
 
     @staticmethod
     def get_holiday_key_format(*args):
-        return '/'.join(*args)
+        return '{}/{}/{}'.format(*args)
 
 
 class MonthHolderBuilder:
