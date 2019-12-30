@@ -172,26 +172,32 @@ class Calendar:
         description = HOLIDAYS.get(day_key, "(...)")
         self.description_text.set('   ' + description)
 
-    def _get_month_holders(self, given_year, given_month):
-        date = datetime.date(given_year, given_month, 1)
+    def _get_last_month_holder(self, date): # TODO move to separate class
         last_month_days = self.get_days_of_last_month(date)
         last_month_date = date - datetime.timedelta(days=5)
         last_month_number, last_month_year = last_month_date.month, last_month_date.year
-        next_month_date = date + datetime.timedelta(days=35)
-        next_month_number, next_month_year = next_month_date.month, next_month_date.year
         previous_month_day_in_view = last_month_days - (self.get_first_day_of_month_as_day_of_week(date) - 2)
-        current_month_day_in_view = 1
-        next_month_day_in_view = 1
-
         if previous_month_day_in_view > last_month_days:
             previous_month_day_in_view -= 7
+        return MonthHolder(previous_month_day_in_view, last_month_days, last_month_number, last_month_year)
 
-        last_month_holder = MonthHolder(
-            previous_month_day_in_view, last_month_days, last_month_number, last_month_year)
-        current_month_holder = MonthHolder(
-            current_month_day_in_view, self.get_days_in_month(date), date.month, given_year)
-        next_month_holder = MonthHolder(
+    def _get_current_month_holder(self, date):
+        current_month_day_in_view = 1
+        return MonthHolder(
+            current_month_day_in_view, self.get_days_in_month(date), date.month, date.year)
+
+    def _get_next_month_holder(self, date):
+        next_month_day_in_view = 1
+        next_month_date = date + datetime.timedelta(days=35)
+        next_month_number, next_month_year = next_month_date.month, next_month_date.year
+        return MonthHolder(
             next_month_day_in_view, float('inf'), next_month_number, next_month_year)
+
+    def _get_month_holders(self, given_year, given_month):
+        date = datetime.date(given_year, given_month, 1)
+        last_month_holder = self._get_last_month_holder(date)
+        current_month_holder = self._get_current_month_holder(date)
+        next_month_holder = self._get_next_month_holder(date)
         return last_month_holder, current_month_holder, next_month_holder
 
     def _create_calendar(self, given_year, given_month):
