@@ -172,13 +172,11 @@ class Calendar:
                     calendar_button.fg = "grey"
                     holder = next_month_holder
 
-                day_key = self._get_holidays_key_format(day=holder.counter, month=holder.month, year=holder.year)
-                calendar_button.set_parameters_depending_on_holiday(day_key)
+                calendar_button.set_parameters_depending_on_holiday(holder.__repr__())
                 day_button = buttons.__next__()
                 day_button.configure(command=lambda button=day_button: self.get_day_description(button),
                                      text=holder.counter, **calendar_button.get_parameters())
                 day_button.grid(row=row+4, column=column, sticky="news")
-                holder.update_counter()
 
     def _get_buttons(self):
         for button in self.buttons:
@@ -243,19 +241,25 @@ class MonthHolderBuilder:
 
 class MonthHolder:
     def __init__(self, starting_point, ending_point, month, year):
-        self.counter = starting_point
+        self._counter = starting_point
         self.maximum = ending_point
         self.month = month
         self.year = year
 
+    @property
+    def counter(self):
+        counter = self._counter
+        self._counter += 1
+        return counter
+
+    def __repr__(self):
+        return f'{self._counter}/{self.month}/{self.year}'
+
     def is_exhausted(self):
-        if self.counter > self.maximum:
+        if self._counter > self.maximum:
             return True
         else:
             return False
-
-    def update_counter(self):
-        self.counter += 1
 
 
 HOLIDAYS = {}
