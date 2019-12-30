@@ -155,22 +155,13 @@ class Calendar:
         self.description_text.set('   ' + description)
 
     def _create_calendar(self, given_year, given_month):
-        last_month_holder, current_month_holder, next_month_holder = MonthHolderBuilder.get_holders(
-            given_year, given_month)
+        holder_builder = MonthHolderBuilder(given_year, given_month)
         buttons = self._get_buttons()
 
         for row in range(6):
             for column in range(7):
                 calendar_button = CalendarButton(column)
-                if not last_month_holder.is_exhausted():
-                    calendar_button.fg = "grey"
-                    holder = last_month_holder
-                elif not current_month_holder.is_exhausted():
-                    calendar_button.state = "normal"
-                    holder = current_month_holder
-                else:
-                    calendar_button.fg = "grey"
-                    holder = next_month_holder
+                holder = holder_builder.decide_which_holder_use(calendar_button)
 
                 calendar_button.set_parameters_depending_on_holiday(holder.__repr__())
                 day_button = buttons.__next__()
@@ -184,8 +175,21 @@ class Calendar:
 
 
 class MonthHolderBuilder:
-    def __init__(self):
-        pass
+    def __init__(self, given_year, given_month):
+        self.last_month_holder, self.current_month_holder, self.next_month_holder = MonthHolderBuilder.get_holders(
+            given_year, given_month)
+
+    def decide_which_holder_use(self, calendar_button):
+        if not self.last_month_holder.is_exhausted():
+            calendar_button.fg = "grey"
+            holder = self.last_month_holder
+        elif not self.current_month_holder.is_exhausted():
+            calendar_button.state = "normal"
+            holder = self.current_month_holder
+        else:
+            calendar_button.fg = "grey"
+            holder = self.next_month_holder
+        return holder
 
     @classmethod
     def get_holders(cls, given_year, given_month):
