@@ -262,7 +262,7 @@ class CalendarButton:
 
     def set_parameters_depending_on_holiday(self, day_key):
         if day_key in HOLIDAYS:
-            self.bg = "#B2B2B2" if HOLIDAYS[day_key] == "Current day" else "#C0C0C0"
+            self.bg = "#B0B0B0" if HOLIDAYS[day_key] == "Current day" else "#C0C0C0"
             self.fg = "#FFFFFF"
         else:
             self.bg = "#FFFFFF" if self.is_weekend else "#d9d9d9"
