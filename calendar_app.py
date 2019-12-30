@@ -65,14 +65,6 @@ class Calendar:
     def _start_calendar(self):
         self.main_window.mainloop()
 
-    @staticmethod
-    def get_first_day_of_month_as_day_of_week(date_in_time):
-        return datetime.date(date_in_time.year, date_in_time.month, 1).isoweekday()
-
-    @staticmethod
-    def get_days_in_month(date_in_time):
-        return max(calendar.monthrange(date_in_time.year, date_in_time.month))
-
     def _set_arrows(self, row, block_type):
         left_arrow_method = self.__getattribute__(f"get_last_{block_type}")
         right_arrow_method = self.__getattribute__(f"get_next_{block_type}")
@@ -116,16 +108,6 @@ class Calendar:
     def get_date_string(self, date_in_time):
         today = self.days[date_in_time.isoweekday() - 1]
         return f"{today}, {self.months[date_in_time.month-1]} {date_in_time.day}, {date_in_time.year}"
-
-    def get_days_of_last_month(self, date_in_time):
-        if date_in_time.month == 1:
-            year = date_in_time.year - 1
-            month = 12
-            last_month_date = datetime.date(year, month, 1)
-        else:
-            month = date_in_time.month - 1
-            last_month_date = datetime.date(date_in_time.year, month, 1)
-        return self.get_days_in_month(last_month_date)
 
     def get_last_month(self):
         if self.months.index(self.month_text.get()) + 1 == 1:
@@ -172,36 +154,9 @@ class Calendar:
         description = HOLIDAYS.get(day_key, "(...)")
         self.description_text.set('   ' + description)
 
-    def _get_last_month_holder(self, date): # TODO move to separate class
-        last_month_days = self.get_days_of_last_month(date)
-        last_month_date = date - datetime.timedelta(days=5)
-        last_month_number, last_month_year = last_month_date.month, last_month_date.year
-        previous_month_day_in_view = last_month_days - (self.get_first_day_of_month_as_day_of_week(date) - 2)
-        if previous_month_day_in_view > last_month_days:
-            previous_month_day_in_view -= 7
-        return MonthHolder(previous_month_day_in_view, last_month_days, last_month_number, last_month_year)
-
-    def _get_current_month_holder(self, date):
-        current_month_day_in_view = 1
-        return MonthHolder(
-            current_month_day_in_view, self.get_days_in_month(date), date.month, date.year)
-
-    def _get_next_month_holder(self, date):
-        next_month_day_in_view = 1
-        next_month_date = date + datetime.timedelta(days=35)
-        next_month_number, next_month_year = next_month_date.month, next_month_date.year
-        return MonthHolder(
-            next_month_day_in_view, float('inf'), next_month_number, next_month_year)
-
-    def _get_month_holders(self, given_year, given_month):
-        date = datetime.date(given_year, given_month, 1)
-        last_month_holder = self._get_last_month_holder(date)
-        current_month_holder = self._get_current_month_holder(date)
-        next_month_holder = self._get_next_month_holder(date)
-        return last_month_holder, current_month_holder, next_month_holder
-
     def _create_calendar(self, given_year, given_month):
-        last_month_holder, current_month_holder, next_month_holder = self._get_month_holders(given_year, given_month)
+        last_month_holder, current_month_holder, next_month_holder = MonthHolderBuilder.get_holders(
+            given_year, given_month)
         buttons = self._get_buttons()
 
         for row in range(6):
@@ -228,6 +183,62 @@ class Calendar:
     def _get_buttons(self):
         for button in self.buttons:
             yield button
+
+
+class MonthHolderBuilder:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def get_holders(cls, given_year, given_month):
+        date = datetime.date(given_year, given_month, 1)
+        last_month_holder = cls._get_last_month_holder(date)
+        current_month_holder = cls._get_current_month_holder(date)
+        next_month_holder = cls._get_next_month_holder(date)
+        return last_month_holder, current_month_holder, next_month_holder
+
+    @classmethod
+    def _get_last_month_holder(cls, date):
+        last_month_days = cls._get_days_of_last_month(date)
+        last_month_date = date - datetime.timedelta(days=5)
+        last_month_number, last_month_year = last_month_date.month, last_month_date.year
+        previous_month_day_in_view = last_month_days - (cls._get_first_day_of_month_as_day_of_week(date) - 2)
+        if previous_month_day_in_view > last_month_days:
+            previous_month_day_in_view -= 7
+        return MonthHolder(previous_month_day_in_view, last_month_days, last_month_number, last_month_year)
+
+    @classmethod
+    def _get_current_month_holder(cls, date):
+        current_month_day_in_view = 1
+        return MonthHolder(
+            current_month_day_in_view, cls._get_days_in_month(date), date.month, date.year)
+
+    @staticmethod
+    def _get_next_month_holder(date):
+        next_month_day_in_view = 1
+        next_month_date = date + datetime.timedelta(days=35)
+        next_month_number, next_month_year = next_month_date.month, next_month_date.year
+        return MonthHolder(
+            next_month_day_in_view, float('inf'), next_month_number, next_month_year)
+
+    @classmethod
+    def _get_days_of_last_month(cls, date_in_time):
+        if date_in_time.month == 1:
+            year = date_in_time.year - 1
+            month = 12
+            last_month_date = datetime.date(year, month, 1)
+        else:
+            month = date_in_time.month - 1
+            last_month_date = datetime.date(date_in_time.year, month, 1)
+        return cls._get_days_in_month(last_month_date)
+
+    @staticmethod
+    def _get_days_in_month(date_in_time):
+        return max(calendar.monthrange(date_in_time.year, date_in_time.month))
+
+    @staticmethod
+    def _get_first_day_of_month_as_day_of_week(date_in_time):
+        return datetime.date(date_in_time.year, date_in_time.month, 1).isoweekday()
 
 
 class MonthHolder:
