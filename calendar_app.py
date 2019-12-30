@@ -25,7 +25,6 @@ class Calendar:
 
     def setup_window(self):
         self._general_setup()
-        self._declare_range_for_holidays()
         today_button = tkinter.Button(self.main_window, text=self.get_date_string(self.current_date),
                                       font="arial 10 italic",
                                       command=self.default_start, background="#E0E0E0")
@@ -86,25 +85,6 @@ class Calendar:
         self.main_window.minsize(301, 391)
         self.main_window.maxsize(301, 391)
 
-    @staticmethod
-    def _get_holidays_key_format(day, month, year):
-        return f'{day}/{month}/{year}'
-
-    def _declare_range_for_holidays(self):
-        current_day = self._get_holidays_key_format(
-            day=self.current_date.day,
-            month=self.current_date.month,
-            year=self.current_date.year)
-        HOLIDAYS[current_day] = "Current day"
-        for x in range(self.current_date.year - 20, self.current_date.year + 20):
-            holidays = Poland().holidays(x)
-            for holiday in holidays:
-                dictionary_key = self._get_holidays_key_format(
-                    day=holiday[0].day,
-                    month=holiday[0].month,
-                    year=holiday[0].year)
-                HOLIDAYS[dictionary_key] = holiday[1]
-
     def get_date_string(self, date_in_time):
         today = self.days[date_in_time.isoweekday() - 1]
         return f"{today}, {self.months[date_in_time.month-1]} {date_in_time.day}, {date_in_time.year}"
@@ -147,11 +127,11 @@ class Calendar:
                                                          (self.months.index(self.month_text.get()) + 1),
                                                          day_of_month))
         self.description_date.set(date_string)
-        day_key = self._get_holidays_key_format(
-            day=day_of_month,
-            month=self.months.index(self.month_text.get())+1,
-            year=self.year_text.get())
-        description = HOLIDAYS.get(day_key, "(...)")
+        day_key = Holidays.get_holiday_key_format(
+            day_of_month,
+            self.months.index(self.month_text.get())+1,
+            self.year_text.get())
+        description = Holidays.holidays.get(day_key, "(...)")
         self.description_text.set('   ' + description)
 
     def _create_calendar(self, given_year, given_month):
@@ -172,6 +152,22 @@ class Calendar:
     def _get_buttons(self):
         for button in self.buttons:
             yield button
+
+
+class Holidays:
+    holidays = {}
+    today = datetime.date.today()
+    current_day = f"{today.day}/{today.month}/{today.year}"
+    holidays[current_day] = "Current day"
+    for x in range(today.year - 20, today.year + 20):
+        given_holidays = Poland().holidays(x)
+        for holiday in given_holidays:
+            dictionary_key = f"{holiday[0].day}/{holiday[0].month}/{holiday[0].year}"
+            holidays[dictionary_key] = holiday[1]
+
+    @staticmethod
+    def get_holiday_key_format(*args):
+        return '/'.join(*args)
 
 
 class MonthHolderBuilder:
@@ -266,9 +262,6 @@ class MonthHolder:
             return False
 
 
-HOLIDAYS = {}
-
-
 class CalendarButton:
     def __init__(self, column):
         self.state = "disabled"
@@ -286,8 +279,8 @@ class CalendarButton:
         }
 
     def set_parameters_depending_on_holiday(self, day_key):
-        if day_key in HOLIDAYS:
-            self.bg = "#B0B0B0" if HOLIDAYS[day_key] == "Current day" else "#C0C0C0"
+        if day_key in Holidays.holidays:
+            self.bg = "#B0B0B0" if Holidays.holidays[day_key] == "Current day" else "#C0C0C0"
             self.fg = "#FFFFFF"
         else:
             self.bg = "#FFFFFF" if self.is_weekend else "#d9d9d9"
