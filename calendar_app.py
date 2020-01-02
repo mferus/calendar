@@ -65,9 +65,9 @@ class Calendar:
         self.main_window.mainloop()
 
     def _set_arrows(self, row, block_type):
-        left_arrow_method = self.__getattribute__(f"get_last_{block_type}")
-        right_arrow_method = self.__getattribute__(f"get_next_{block_type}")
-        text_method = self.__getattribute__(f"{block_type}_text")
+        left_arrow_method = getattr(self, f"get_last_{block_type}")
+        right_arrow_method = getattr(self, f"get_next_{block_type}")
+        text_method = getattr(self, f"{block_type}_text")
         left_arrow = tkinter.Button(self.main_window, text="<",
                                     command=left_arrow_method, background="#E0E0E0")
         left_arrow.grid(row=row, column=0)
@@ -143,8 +143,8 @@ class Calendar:
                 calendar_button = CalendarButton(column)
                 holder = holder_builder.get_holder(calendar_button)
 
-                calendar_button.set_parameters_depending_on_holiday(holder.__repr__())
-                day_button = buttons.__next__()
+                calendar_button.set_parameters_depending_on_holiday(str(holder))
+                day_button = next(buttons)
                 day_button.configure(command=lambda button=day_button: self.get_day_description(button),
                                      text=holder.counter, **calendar_button.get_parameters())
                 day_button.grid(row=row+4, column=column, sticky="news")
@@ -252,7 +252,7 @@ class MonthHolder:
         self._counter += 1
         return counter
 
-    def __repr__(self):
+    def __str__(self):
         return f'{self._counter}/{self.month}/{self.year}'
 
     def is_exhausted(self):
