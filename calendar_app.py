@@ -159,7 +159,7 @@ class Holidays:
     today = datetime.date.today()
     current_day = f"{today.day}/{today.month}/{today.year}"
     holidays[current_day] = "Current day"
-    for x in range(today.year - 20, today.year + 20):
+    for x in range(today.year - 100, today.year + 100):
         given_holidays = Poland().holidays(x)
         for holiday in given_holidays:
             dictionary_key = f"{holiday[0].day}/{holiday[0].month}/{holiday[0].year}"
